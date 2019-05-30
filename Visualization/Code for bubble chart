@@ -1,0 +1,35 @@
+library("readxl")
+library("ggplot2")
+library("tidyverse")
+library("ggthemes")
+library("ggrepel")
+
+setwd("G:/My Drive/2018/FGM/01 -Survival Analysis/06 -Visualization")
+
+
+data <- read_excel("Data for bubble chart.xlsx")
+
+names(data) <- c("country", "risk_girls", "risk_group", "year", "prevalence_women", "survey", "pop", "source_pop", "note")
+
+data <- data %>%
+  select(c("country", "risk_girls", "risk_group", "prevalence_women", "pop"))
+
+setwd("G:/My Drive/2019/1- FGM/05- Country profiles/Factsheets/Summary Figure")
+
+plot <- ggplot(data, aes(x=pop, y=prevalence_women)) +
+        geom_point(alpha=0.2, aes(size=risk_girls, color = risk_girls)) +
+        scale_size_continuous(limits=c(0, 12000), breaks=seq(0, 12000, by=3000), range = c(0,35)) +
+        scale_color_continuous(limits=c(0, 12000), breaks=seq(0, 12000, by=3000), low="chartreuse3", high = "brown2")+ 
+        guides(color= guide_legend(), size=guide_legend())+
+        geom_text_repel(aes(label=country),
+                   point.padding = NA)+
+        labs(title = "Number of girls at riks of FGM between 2019 and 2030, by country",
+             y = "Prevalence of FGM among women age 15-49, in percent",
+             x = "Population of girls aged 0-14 in 2022",
+             color = "Number of girls at risk,\n (in thousands)",
+             size = "Number of girls at risk,\n (in thousands)")+
+             xlim(0, 50000)+
+        theme_few()
+
+ggsave(file = paste("bubble_chart.pdf"))
+  
